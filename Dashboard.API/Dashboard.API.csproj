@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Dashboard.DAL\Dashboard.DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="data\htmlPages\" />
+  </ItemGroup>
+
 </Project>

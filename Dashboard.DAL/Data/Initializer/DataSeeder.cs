@@ -14,7 +14,23 @@ namespace Dashboard.DAL.Data.Initializer
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
 
-                // ваш код
+                if(!roleManager.Roles.Any())
+                {
+                    var adminRole = new Role
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = Settings.AdminRole
+                    };
+
+                    var userRole = new Role
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = Settings.UserRole
+                    };
+
+                    await roleManager.CreateAsync(adminRole);
+                    await roleManager.CreateAsync(userRole);
+                }
             }
         }
     }
