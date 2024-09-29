@@ -1,6 +1,7 @@
 ﻿using Dashboard.DAL.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Dashboard.DAL.Repositories.UserRepository
 {
@@ -11,6 +12,11 @@ namespace Dashboard.DAL.Repositories.UserRepository
         public UserRepository(UserManager<User> userManager)
         {
             _userManager = userManager;
+        }
+
+        public async Task<IdentityResult> AddToRoleAsync(User model, string role)
+        {
+            return await _userManager.AddToRoleAsync(model, role);
         }
 
         public async Task<bool> CheckPasswordAsync(User user, string password)
@@ -29,33 +35,54 @@ namespace Dashboard.DAL.Repositories.UserRepository
             return result;
         }
 
+        public async Task<IdentityResult> DeleteAsync(User model)
+        {
+            var result = await _userManager.DeleteAsync(model);
+            return result;
+        }
+
         public async Task<string> GenerateEmailConfirmationTokenAsync(User user)
         {
             return await _userManager.GenerateEmailConfirmationTokenAsync(user);
         }
 
-        public async Task<User?> GetByEmailAsync(string email)
+        public async Task<List<User>> GetAllAsync()
         {
             return await _userManager.Users
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
-                .FirstOrDefaultAsync(u => u.Email == email);
+                .ToListAsync();
         }
 
-        public async Task<User?> GetByIdAsync(string id)
+        public async Task<User?> GetByEmailAsync(string email, bool includes = false)
         {
-            return await _userManager.Users
-                .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
-                .FirstOrDefaultAsync(u => u.Id == id);
+            return await GetUserAsync(u => u.Email == email, includes);
         }
 
-        public async Task<User?> GetByUsernameAsync(string userName)
+        public async Task<User?> GetByIdAsync(string id, bool includes = false)
         {
-            return await _userManager.Users
+            return await GetUserAsync(u => u.Id == id, includes);
+        }
+
+        public async Task<User?> GetByUsernameAsync(string userName, bool includes = false)
+        {
+            return await GetUserAsync(u => u.UserName == userName, includes);
+        }
+
+        public async Task<User?> GetUserAsync(Expression<Func<User, bool>> predicate, bool includes = false)
+        {
+            if (includes)
+            {
+                return await _userManager.Users
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
-                .FirstOrDefaultAsync(u => u.UserName == userName);
+                .FirstOrDefaultAsync(predicate);
+            }
+            else
+            {
+                return await _userManager.Users
+                .FirstOrDefaultAsync(predicate);
+            }
         }
 
         public async Task<bool> IsUniqueEmailAsync(string email)
@@ -66,6 +93,12 @@ namespace Dashboard.DAL.Repositories.UserRepository
         public async Task<bool> IsUniqueUserNameAsync(string userName)
         {
             return await _userManager.FindByNameAsync(userName) == null;
+        }
+
+        public async Task<IdentityResult> UpdateAsync(User model)
+        {
+            var result = await _userManager.UpdateAsync(model);
+            return result;
         }
     }
 }

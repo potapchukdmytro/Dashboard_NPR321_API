@@ -6,8 +6,10 @@ using Dashboard.DAL.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace Dashboard.BLL.Services.AccountService
@@ -67,19 +69,29 @@ namespace Dashboard.BLL.Services.AccountService
                 return ServiceResponse.BadRequestResponse($"Пароль вказано невірно");
             }
 
-            var userVM = new UserVM
+            var issuer = _configuration["AuthSettings:issuer"];
+            var audience = _configuration["AuthSettings:audience"];
+            var keyString = _configuration["AuthSettings:key"];
+            var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
+
+            var claims = new Claim[]
             {
-                Id = user.Id,
-                Email = user.Email,
-                UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                PhoneNumber = user.PhoneNumber,
-                Image = user.Image,
-                Role = user.UserRoles.Count == 0 ? Settings.UserRole : user.UserRoles.First().Role.Name
+                new Claim("id", user.Id),
+                new Claim("email", user.Email)
             };
 
-            return ServiceResponse.OkResponse("Успіший вхід", userVM);
+            // Creating token
+            var token = new JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(1),
+                signingCredentials: new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256)
+                );
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return ServiceResponse.OkResponse("Успіший вхід", jwt);
         }
 
         public async Task<ServiceResponse> SignUpAsync(SignUpVM model)
