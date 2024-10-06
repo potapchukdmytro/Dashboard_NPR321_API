@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Dashboard.BLL.Services.ImageService;
+using Dashboard.DAL;
 using Dashboard.DAL.Models.Identity;
 using Dashboard.DAL.Repositories.UserRepository;
 using Dashboard.DAL.ViewModels;
@@ -8,12 +10,41 @@ namespace Dashboard.BLL.Services.UserService
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IImageService _imageService;
         private readonly IMapper _mapper;
 
-        public UserService(IUserRepository userRepository, IMapper mapper)
+        public UserService(IUserRepository userRepository, IMapper mapper, IImageService imageService)
         {
             _userRepository = userRepository;
             _mapper = mapper;
+            _imageService = imageService;
+        }
+
+        public async Task<ServiceResponse> AddImageFromUserAsync(UserImageVM model)
+        {
+            var user = await _userRepository.GetByIdAsync(model.UserId);
+
+            if(user == null)
+            {
+                return ServiceResponse.BadRequestResponse($"Користувача з id {model.UserId} не знайдено"); 
+            }
+
+            var response = await _imageService.SaveImageFromFileAsync(Settings.UserImagesPath, model.Image);
+
+            if(!response.Success)
+            {
+                return response;
+            }
+
+            user.Image = response.Payload.ToString();
+            var result = await _userRepository.UpdateAsync(user);
+
+            if(!result.Succeeded)
+            {
+                return ServiceResponse.BadRequestResponse(result.Errors.First().Description);
+            }
+
+            return ServiceResponse.OkResponse("Зображення успішно додано");
         }
 
         public async Task<ServiceResponse> CreateAsync(CreateUpdateUserVM model)

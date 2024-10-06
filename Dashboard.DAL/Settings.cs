@@ -6,5 +6,6 @@
         public static string UserRole = "User";
         public static string AdminRole = "Admin";
         public static string HtmlPagesPath = "data/htmlPages";
+        public static string UserImagesPath = "data/images/user";
     }
 }

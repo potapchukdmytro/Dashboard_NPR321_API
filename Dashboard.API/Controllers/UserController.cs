@@ -1,24 +1,71 @@
 ﻿using Dashboard.BLL.Services;
+using Dashboard.BLL.Services.ImageService;
 using Dashboard.BLL.Services.UserService;
 using Dashboard.BLL.Validators;
+using Dashboard.DAL;
 using Dashboard.DAL.Models.Identity;
 using Dashboard.DAL.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace Dashboard.API.Controllers
 {
+    // from base64
+    //public class UserImageVM
+    //{
+    //    public string UserId { get; set; }
+    //    public string Base64Image { get; set; }
+    //}
+
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : BaseController
     {
         private readonly UserManager<User> _userManager;
         private readonly IUserService _userService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IImageService _imageService;
 
-        public UserController(UserManager<User> userManager, IUserService userService)
+        public UserController(UserManager<User> userManager, IUserService userService, IWebHostEnvironment webHostEnvironment, IImageService imageService)
         {
             _userManager = userManager;
             _userService = userService;
+            _webHostEnvironment = webHostEnvironment;
+            _imageService = imageService;
+        }
+
+        //[HttpPost("image")]
+        //public async Task<IActionResult> AddImageFromUserAsync([FromBody] UserImageVM model)
+        //{
+        //    var response = await _imageService.SaveImageFromBase64Async(Settings.UserImagesPath, model.Base64Image);
+
+        //    if (response.Success)
+        //    {
+        //        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == model.UserId);
+
+        //        if (user != null)
+        //        {
+        //            user.Image = response.Payload.ToString();
+        //            await _userManager.UpdateAsync(user);
+        //        }
+        //    }
+
+        //    return Ok();
+        //}
+
+        [HttpPost("image")]
+        public async Task<IActionResult> AddImageFromUserAsync([FromForm] UserImageVM model)
+        {
+            if(string.IsNullOrEmpty(model.UserId) || model.Image == null)
+            {
+                return BadRequest(ServiceResponse.BadRequestResponse("Некоректні дані"));
+            }
+
+            var response = await _userService.AddImageFromUserAsync(model);
+
+            return GetResult(response);
         }
 
         [HttpGet]
@@ -75,7 +122,7 @@ namespace Dashboard.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync(CreateUpdateUserVM model)
+        public async Task<IActionResult> CreateAsync([FromBody] CreateUpdateUserVM model)
         {
             var validator = new CreateUserValidator();
             var validateResult = await validator.ValidateAsync(model);

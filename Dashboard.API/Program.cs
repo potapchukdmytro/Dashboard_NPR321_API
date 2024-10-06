@@ -1,5 +1,6 @@
 using Dashboard.BLL.Middlewares;
 using Dashboard.BLL.Services.AccountService;
+using Dashboard.BLL.Services.ImageService;
 using Dashboard.BLL.Services.MailService;
 using Dashboard.BLL.Services.RoleService;
 using Dashboard.BLL.Services.UserService;
@@ -63,6 +64,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
 // Add repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -96,6 +98,12 @@ app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "data")),
     RequestPath = "/files"
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "data/images")),
+    RequestPath = "/images"
 });
 
 app.MapControllers();

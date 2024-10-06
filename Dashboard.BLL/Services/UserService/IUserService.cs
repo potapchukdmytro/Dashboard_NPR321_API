@@ -11,5 +11,6 @@ namespace Dashboard.BLL.Services.UserService
         Task<ServiceResponse> DeleteAsync(string id);
         Task<ServiceResponse> CreateAsync(CreateUpdateUserVM model);
         Task<ServiceResponse> UpdateAsync(CreateUpdateUserVM model);
+        Task<ServiceResponse> AddImageFromUserAsync(UserImageVM model);
     }
 }
