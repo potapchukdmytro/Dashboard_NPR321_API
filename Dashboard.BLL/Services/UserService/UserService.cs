@@ -80,7 +80,7 @@ namespace Dashboard.BLL.Services.UserService
             return ServiceResponse.OkResponse("Користувачів отримано", models);
         }
 
-        public async Task<ServiceResponse> GetByEmail(string email)
+        public async Task<ServiceResponse> GetByEmailAsync(string email)
         {
             var user = await _userRepository.GetByEmailAsync(email, true);
 
@@ -94,7 +94,7 @@ namespace Dashboard.BLL.Services.UserService
             return ServiceResponse.OkResponse("Користувача знайдено", model);
         }
 
-        public async Task<ServiceResponse> GetById(string id)
+        public async Task<ServiceResponse> GetByIdAsync(string id)
         {
             var user = await _userRepository.GetByIdAsync(id, true);
 
@@ -108,7 +108,7 @@ namespace Dashboard.BLL.Services.UserService
             return ServiceResponse.OkResponse("Користувача знайдено", model);
         }
 
-        public async Task<ServiceResponse> GetByUserName(string userName)
+        public async Task<ServiceResponse> GetByUserNameAsync(string userName)
         {
             var user = await _userRepository.GetByUsernameAsync(userName, true);
 

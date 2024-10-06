@@ -1,10 +1,13 @@
+using Dashboard.BLL.Middlewares;
 using Dashboard.BLL.Services.AccountService;
 using Dashboard.BLL.Services.MailService;
+using Dashboard.BLL.Services.RoleService;
 using Dashboard.BLL.Services.UserService;
 using Dashboard.DAL;
 using Dashboard.DAL.Data;
 using Dashboard.DAL.Data.Initializer;
 using Dashboard.DAL.Models.Identity;
+using Dashboard.DAL.Repositories.RoleRepository;
 using Dashboard.DAL.Repositories.UserRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -59,9 +62,11 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 // Add repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 // Add automapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -79,6 +84,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<MiddlewareExceptionHandling>();
 
 app.UseHttpsRedirection();
 

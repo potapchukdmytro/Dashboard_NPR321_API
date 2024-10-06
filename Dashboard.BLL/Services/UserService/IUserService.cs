@@ -4,9 +4,9 @@ namespace Dashboard.BLL.Services.UserService
 {
     public interface IUserService
     {
-        Task<ServiceResponse> GetById(string id);
-        Task<ServiceResponse> GetByEmail(string email);
-        Task<ServiceResponse> GetByUserName(string userName);
+        Task<ServiceResponse> GetByIdAsync(string id);
+        Task<ServiceResponse> GetByEmailAsync(string email);
+        Task<ServiceResponse> GetByUserNameAsync(string userName);
         Task<ServiceResponse> GetAllAsync();
         Task<ServiceResponse> DeleteAsync(string id);
         Task<ServiceResponse> CreateAsync(CreateUpdateUserVM model);

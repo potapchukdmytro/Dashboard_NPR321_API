@@ -21,19 +21,22 @@ namespace Dashboard.API.Controllers
             _userService = userService;
         }
 
-        [HttpGet("AllUsers")]
-        public async Task<IActionResult> GetAllUsersAsync()
-        {
-            var response = await _userService.GetAllAsync();
-            return GetResult(response);
-        }
-
         [HttpGet]
-        public async Task<IActionResult> GetUserAsync(string? id, string? email, string? userName)
+        public async Task<IActionResult> GetUserAsync([FromQuery] string? id, string? email, string? userName)
         {
+            id = Request.Query[nameof(id)];
+            userName = Request.Query[nameof(userName)];
+            email = Request.Query[nameof(email)];
+
+            if (id == null && userName == null && email == null)
+            {
+                var response = await _userService.GetAllAsync();
+                return GetResult(response);
+            }
+
             if (!string.IsNullOrEmpty(id))
             {
-                var response = await _userService.GetById(id);
+                var response = await _userService.GetByIdAsync(id);
                 if (response.Success)
                 {
                     return GetResult(response);
@@ -41,7 +44,7 @@ namespace Dashboard.API.Controllers
             }
             if (!string.IsNullOrEmpty(email))
             {
-                var response = await _userService.GetByEmail(email);
+                var response = await _userService.GetByEmailAsync(email);
                 if (response.Success)
                 {
                     return GetResult(response);
@@ -49,7 +52,7 @@ namespace Dashboard.API.Controllers
             }
             if (!string.IsNullOrEmpty(userName))
             {
-                var response = await _userService.GetByUserName(userName);
+                var response = await _userService.GetByUserNameAsync(userName);
                 if (response.Success)
                 {
                     return GetResult(response);
