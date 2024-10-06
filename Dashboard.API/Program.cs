@@ -26,6 +26,19 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer("name=Default");
 });
 
+// Add CORS
+var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: myAllowSpecificOrigins, policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+    });
+});
+
 // Add identity
 builder.Services.AddIdentity<User, Role>(options =>
 {
@@ -93,6 +106,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCors(myAllowSpecificOrigins);
 
 app.UseStaticFiles(new StaticFileOptions
 {
