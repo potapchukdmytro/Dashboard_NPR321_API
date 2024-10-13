@@ -1,5 +1,6 @@
 ﻿using Dashboard.BLL.Services;
 using Dashboard.BLL.Services.RoleService;
+using Dashboard.DAL.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dashboard.API.Controllers
@@ -47,6 +48,42 @@ namespace Dashboard.API.Controllers
             }
 
             return GetResult(ServiceResponse.BadRequestResponse("Не вдалося отримати роль"));
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAsync(string id)
+        {
+            if(string.IsNullOrEmpty(id))
+            {
+                return GetResult(ServiceResponse.BadRequestResponse("id ролі не може бути порожнім"));
+            }
+
+            var response = await _roleService.DeleteAsync(id);
+            return GetResult(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateAsync(RoleVM model)
+        {
+            if (string.IsNullOrEmpty(model.Name))
+            {
+                return GetResult(ServiceResponse.BadRequestResponse("Ім'я ролі не може бути порожнім"));
+            }
+
+            var response = await _roleService.CreteAsync(model);
+            return GetResult(response);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateAsync(RoleVM model)
+        {
+            if (string.IsNullOrEmpty(model.Name))
+            {
+                return GetResult(ServiceResponse.BadRequestResponse("Ім'я ролі не може бути порожнім"));
+            }
+
+            var response = await _roleService.UpdateAsync(model);
+            return GetResult(response);
         }
     }
 }

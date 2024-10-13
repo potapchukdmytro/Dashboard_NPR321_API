@@ -55,7 +55,7 @@ namespace Dashboard.BLL.Services.AccountService
 
         public async Task<ServiceResponse> SignInAsync(SignInVM model)
         {
-            var user = await _userRepository.GetByEmailAsync(model.Email);
+            var user = await _userRepository.GetByEmailAsync(model.Email, true);
 
             if (user == null)
             {
@@ -74,11 +74,25 @@ namespace Dashboard.BLL.Services.AccountService
             var keyString = _configuration["AuthSettings:key"];
             var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
 
-            var claims = new Claim[]
+            var claims = new List<Claim>
             {
                 new Claim("id", user.Id),
                 new Claim("email", user.Email)
             };
+
+            if(user.UserRoles.Count() > 0)
+            {
+                var roleClaims = user.UserRoles.Select(ur => new Claim(
+                    "role",
+                    ur.Role.Name
+                    )).ToArray();
+
+                claims.AddRange(roleClaims);
+            }
+            else
+            {
+                claims.Add(new Claim("role", Settings.UserRole));
+            }
 
             // Creating token
             var token = new JwtSecurityToken(

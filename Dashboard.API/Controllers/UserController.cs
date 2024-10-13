@@ -2,13 +2,12 @@
 using Dashboard.BLL.Services.ImageService;
 using Dashboard.BLL.Services.UserService;
 using Dashboard.BLL.Validators;
-using Dashboard.DAL;
 using Dashboard.DAL.Models.Identity;
 using Dashboard.DAL.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Text;
 
 namespace Dashboard.API.Controllers
 {
@@ -20,6 +19,8 @@ namespace Dashboard.API.Controllers
     //}
 
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Roles = "admin")]
     [Route("api/[controller]")]
     public class UserController : BaseController
     {
@@ -55,6 +56,7 @@ namespace Dashboard.API.Controllers
         //    return Ok();
         //}
 
+        [AllowAnonymous] // даний метод не потребує авторизації
         [HttpPost("image")]
         public async Task<IActionResult> AddImageFromUserAsync([FromForm] UserImageVM model)
         {

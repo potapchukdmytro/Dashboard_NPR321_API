@@ -14,6 +14,18 @@ namespace Dashboard.DAL.Repositories.RoleRepository
             _roleManager = roleManager;
         }
 
+        public async Task<IdentityResult> CreateAsync(Role model)
+        {
+            var result = await _roleManager.CreateAsync(model);
+            return result;
+        }
+
+        public async Task<IdentityResult> DeleteAsync(Role model)
+        {
+            var result = await _roleManager.DeleteAsync(model);
+            return result;
+        }
+
         public async Task<List<Role>> GetAllAsync()
         {
             return await _roleManager.Roles.ToListAsync();
@@ -32,7 +44,18 @@ namespace Dashboard.DAL.Repositories.RoleRepository
 
         public async Task<Role?> GetByNameAsync(string name)
         {
-            return await GetAsync(r => r.Name == name);
+            return await GetAsync(r => r.NormalizedName == name.ToUpper());
+        }
+
+        public async Task<bool> IsUniqueNameAsync(string name)
+        {
+            return await GetByNameAsync(name) == null;
+        }
+
+        public async Task<IdentityResult> UpdateAsync(Role model)
+        {
+            var result = await _roleManager.UpdateAsync(model);
+            return result;
         }
     }
 }

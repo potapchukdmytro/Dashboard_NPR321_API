@@ -1,6 +1,7 @@
 ﻿using Dashboard.BLL.Services.AccountService;
 using Dashboard.BLL.Validators;
 using Dashboard.DAL.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dashboard.API.Controllers

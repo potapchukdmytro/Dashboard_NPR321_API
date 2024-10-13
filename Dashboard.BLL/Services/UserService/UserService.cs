@@ -71,14 +71,7 @@ namespace Dashboard.BLL.Services.UserService
 
             result = await _userRepository.AddToRoleAsync(user, model.Role);
 
-            if (result.Succeeded)
-            {
-                return ServiceResponse.OkResponse("Користувач успішно створений");
-            }
-            else
-            {
-                return ServiceResponse.BadRequestResponse(result.Errors.First().Description);
-            }
+            return ServiceResponse.ByIdentityResult(result, "Користувач успішно створений");
         }
 
         public async Task<ServiceResponse> DeleteAsync(string id)
@@ -92,14 +85,7 @@ namespace Dashboard.BLL.Services.UserService
 
             var result = await _userRepository.DeleteAsync(user);
 
-            if(result.Succeeded)
-            {
-                return ServiceResponse.OkResponse($"Користувача з id {id} успішно видалено");
-            }
-            else
-            {
-                return ServiceResponse.BadRequestResponse(result.Errors.First().Description);
-            }
+            return ServiceResponse.ByIdentityResult(result, $"Користувача з id {id} успішно видалено");
         }
 
         public async Task<ServiceResponse> GetAllAsync()
@@ -192,14 +178,7 @@ namespace Dashboard.BLL.Services.UserService
                 // Видалити попередню роль та записати нову
             }
 
-            if(result.Succeeded)
-            {
-                return ServiceResponse.OkResponse("Користувача оновлено");
-            }
-            else
-            {
-                return ServiceResponse.BadRequestResponse(result.Errors.First().Description);
-            }
+            return ServiceResponse.ByIdentityResult(result, "Користувач успішно оновлений");
         }
     }
 }

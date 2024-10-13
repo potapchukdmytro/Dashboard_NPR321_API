@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Microsoft.AspNetCore.Identity;
+using System.Net;
 
 namespace Dashboard.BLL.Services
 {
@@ -33,6 +34,18 @@ namespace Dashboard.BLL.Services
         public static ServiceResponse InternalServerErrorResponse(string message, object? payload = null)
         {
             return GetResponse(message, false, payload, HttpStatusCode.InternalServerError);
+        }
+
+        public static ServiceResponse ByIdentityResult(IdentityResult result, string successMessage)
+        {
+            if (result.Succeeded)
+            {
+                return ServiceResponse.OkResponse(successMessage);
+            }
+            else
+            {
+                return ServiceResponse.BadRequestResponse(result.Errors.First().Description);
+            }
         }
     }
 }

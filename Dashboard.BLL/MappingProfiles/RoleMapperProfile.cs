@@ -10,6 +10,9 @@ namespace Dashboard.BLL.MappingProfiles
         {
             // Role -> RoleVM
             CreateMap<Role, RoleVM>();
+
+            // RoleVM -> Role
+            CreateMap<RoleVM, Role>();
         }
     }
 }

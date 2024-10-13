@@ -48,5 +48,59 @@ namespace Dashboard.BLL.Services.RoleService
         {
             return await GetAsync(_roleRepository.GetByNameAsync, name);
         }
+
+        public async Task<ServiceResponse> DeleteAsync(string id)
+        {
+            var role = await _roleRepository.GetByIdAsync(id);
+
+            if(role == null)
+            {
+                return ServiceResponse.BadRequestResponse($"Роль з id {id} не знайдено");
+            }
+
+            var result = await _roleRepository.DeleteAsync(role);
+
+            return ServiceResponse.ByIdentityResult(result, "Роль кспішно видалена");
+        }
+
+        public async Task<ServiceResponse> CreteAsync(RoleVM model)
+        {
+            if(!await _roleRepository.IsUniqueNameAsync(model.Name))
+            {
+                return ServiceResponse.BadRequestResponse($"Роль з іменем {model.Name} вже існує");
+            }
+
+            var role = new Role
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = model.Name,
+                NormalizedName = model.Name.ToUpper()
+            };
+
+            var result = await _roleRepository.CreateAsync(role);
+
+            return ServiceResponse.ByIdentityResult(result, "Роль успішно створена");
+        }
+
+        public async Task<ServiceResponse> UpdateAsync(RoleVM model)
+        {
+            if (!await _roleRepository.IsUniqueNameAsync(model.Name))
+            {
+                return ServiceResponse.BadRequestResponse($"Роль з іменем {model.Name} вже існує");
+            }
+
+            var role = await _roleRepository.GetByIdAsync(model.Id);
+
+            if(role == null)
+            {
+                return ServiceResponse.BadRequestResponse($"Роль з id {model.Id} не знайдено");
+            }
+
+            role = _mapper.Map(model, role);
+
+            var result = await _roleRepository.UpdateAsync(role);
+
+            return ServiceResponse.ByIdentityResult(result, "Роль успішно оновлена");
+        }
     }
 }

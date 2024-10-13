@@ -1,4 +1,5 @@
 ﻿using Dashboard.DAL.Models.Identity;
+using Microsoft.AspNetCore.Identity;
 using System.Linq.Expressions;
 
 namespace Dashboard.DAL.Repositories.RoleRepository
@@ -9,5 +10,9 @@ namespace Dashboard.DAL.Repositories.RoleRepository
         Task<Role?> GetByIdAsync(string id);
         Task<Role?> GetByNameAsync(string name);
         Task<List<Role>> GetAllAsync();
+        Task<IdentityResult> UpdateAsync(Role model);
+        Task<IdentityResult> CreateAsync(Role model);
+        Task<IdentityResult> DeleteAsync(Role model);
+        Task<bool> IsUniqueNameAsync(string name);
     }
 }
