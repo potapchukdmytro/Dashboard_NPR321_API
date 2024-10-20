@@ -1,16 +1,40 @@
-﻿using MailKit.Net.Smtp;
+﻿using Dashboard.DAL;
+using Dashboard.DAL.Models.Identity;
+using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
+using System.Text;
 
 namespace Dashboard.BLL.Services.MailService
 {
     public class MailService : IMailService
     {
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public MailService(IConfiguration configuration)
+        public MailService(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
         {
             _configuration = configuration;
+            _webHostEnvironment = webHostEnvironment;
+        }
+
+        public async Task SendConfirmEmailAsync(User user, string token)
+        {
+            var bytes = Encoding.UTF8.GetBytes(token);
+            var validToken = WebEncoders.Base64UrlEncode(bytes);
+            var address = _configuration["Host:Address"];
+
+            const string URL_PARAM = "emailConfirmUrl";
+            string confirmationUrl = $"{address}/api/account/emailconfrim?u={user.Id}&t={validToken}";
+
+            string rootPath = _webHostEnvironment.ContentRootPath;
+            string templatePath = Path.Combine(rootPath, Settings.HtmlPagesPath, "emailconfirmation.html");
+            string messageText = File.ReadAllText(templatePath);
+            messageText = messageText.Replace(URL_PARAM, confirmationUrl);
+
+            await SendEmailAsync(user.Email, "Підтвердження пошти", messageText, true);
         }
 
         public async Task SendEmailAsync(IEnumerable<string> to, string subject, string text, bool isHtml = false)
@@ -21,7 +45,7 @@ namespace Dashboard.BLL.Services.MailService
 
             BodyBuilder bodyBuilder = new BodyBuilder();
 
-            if(isHtml)
+            if (isHtml)
             {
                 bodyBuilder.HtmlBody = text;
             }

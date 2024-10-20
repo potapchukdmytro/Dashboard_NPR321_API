@@ -1,15 +1,11 @@
-﻿using Dashboard.BLL.Services.MailService;
+﻿using Dashboard.BLL.Services.JwtService;
+using Dashboard.BLL.Services.MailService;
 using Dashboard.DAL;
 using Dashboard.DAL.Models.Identity;
 using Dashboard.DAL.Repositories.UserRepository;
 using Dashboard.DAL.ViewModels;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 
 namespace Dashboard.BLL.Services.AccountService
@@ -19,16 +15,14 @@ namespace Dashboard.BLL.Services.AccountService
         private readonly UserManager<User> _userManager;
         private readonly IUserRepository _userRepository;
         private readonly IMailService _mailService;
-        private readonly IConfiguration _configuration;
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IJwtService _jwtService;
 
-        public AccountService(UserManager<User> userManager, IUserRepository userRepository, IMailService mailService, IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
+        public AccountService(UserManager<User> userManager, IUserRepository userRepository, IMailService mailService, IJwtService jwtService)
         {
             _userManager = userManager;
             _userRepository = userRepository;
             _mailService = mailService;
-            _configuration = configuration;
-            _webHostEnvironment = webHostEnvironment;
+            _jwtService = jwtService;
         }
 
         public async Task<ServiceResponse> EmailConfirmAsync(string id, string token)
@@ -45,7 +39,7 @@ namespace Dashboard.BLL.Services.AccountService
 
             var result = await _userRepository.ConfirmEmailAsync(user, validToken);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
                 return ServiceResponse.BadRequestResponse(result.Errors.First().Description);
             }
@@ -69,48 +63,19 @@ namespace Dashboard.BLL.Services.AccountService
                 return ServiceResponse.BadRequestResponse($"Пароль вказано невірно");
             }
 
-            var issuer = _configuration["AuthSettings:issuer"];
-            var audience = _configuration["AuthSettings:audience"];
-            var keyString = _configuration["AuthSettings:key"];
-            var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
+            var tokens = await _jwtService.GenerateTokensAsync(user);
 
-            var claims = new List<Claim>
+            if(!tokens.Success)
             {
-                new Claim("id", user.Id),
-                new Claim("email", user.Email)
-            };
-
-            if(user.UserRoles.Count() > 0)
-            {
-                var roleClaims = user.UserRoles.Select(ur => new Claim(
-                    "role",
-                    ur.Role.Name
-                    )).ToArray();
-
-                claims.AddRange(roleClaims);
-            }
-            else
-            {
-                claims.Add(new Claim("role", Settings.UserRole));
+                return ServiceResponse.BadRequestResponse("Не вдалося згенерувати токени");
             }
 
-            // Creating token
-            var token = new JwtSecurityToken(
-                issuer: issuer,
-                audience: audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddDays(1),
-                signingCredentials: new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256)
-                );
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return ServiceResponse.OkResponse("Успіший вхід", jwt);
+            return ServiceResponse.OkResponse("Успіший вхід", tokens.Payload);
         }
 
         public async Task<ServiceResponse> SignUpAsync(SignUpVM model)
         {
-            if(!await _userRepository.IsUniqueUserNameAsync(model.UserName))
+            if (!await _userRepository.IsUniqueUserNameAsync(model.UserName))
             {
                 return ServiceResponse.BadRequestResponse($"{model.UserName} вже викорстовується");
             }
@@ -142,25 +107,22 @@ namespace Dashboard.BLL.Services.AccountService
 
             await SendConfirmEmailAsync(user);
 
-            return ServiceResponse.OkResponse($"Користувач {model.Email} успішно зареєстрований", "jwt token");
+            var tokens = await _jwtService.GenerateTokensAsync(user);
+
+            if (!tokens.Success)
+            {
+                return ServiceResponse.BadRequestResponse("Не вдалося згенерувати токени");
+            }
+
+            return ServiceResponse.OkResponse($"Користувач {model.Email} успішно зареєстрований", tokens.Payload);
         }
 
         private async Task SendConfirmEmailAsync(User user)
         {
             string token = await _userRepository.GenerateEmailConfirmationTokenAsync(user);
-            var bytes = Encoding.UTF8.GetBytes(token);
-            var validToken = WebEncoders.Base64UrlEncode(bytes);
-            var address = _configuration["Host:Address"];
-
-            const string URL_PARAM = "emailConfirmUrl";
-            string confirmationUrl = $"{address}/api/account/emailconfrim?u={user.Id}&t={validToken}";
-
-            string rootPath = _webHostEnvironment.ContentRootPath;
-            string templatePath = Path.Combine(rootPath, Settings.HtmlPagesPath, "emailconfirmation.html");
-            string messageText = File.ReadAllText(templatePath);
-            messageText = messageText.Replace(URL_PARAM, confirmationUrl);
-
-            await _mailService.SendEmailAsync(user.Email, "Підтвердження пошти", messageText, true);
+            await _mailService.SendConfirmEmailAsync(user, token);
         }
+
+
     }
 }

@@ -1,7 +1,8 @@
-﻿using Dashboard.BLL.Services.AccountService;
+﻿using Dashboard.BLL.Services;
+using Dashboard.BLL.Services.AccountService;
+using Dashboard.BLL.Services.JwtService;
 using Dashboard.BLL.Validators;
 using Dashboard.DAL.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dashboard.API.Controllers
@@ -11,10 +12,12 @@ namespace Dashboard.API.Controllers
     public class AccountController : BaseController
     {
         private readonly IAccountService _accountService;
+        private readonly IJwtService _jwtService;
 
-        public AccountController(IAccountService accountService)
+        public AccountController(IAccountService accountService, IJwtService jwtService)
         {
             _accountService = accountService;
+            _jwtService = jwtService;
         }
 
         [HttpPost("signin")]
@@ -57,6 +60,19 @@ namespace Dashboard.API.Controllers
             }
 
             var response = await _accountService.EmailConfirmAsync(u, t);
+            return GetResult(response);
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshTokensAsync([FromBody] JwtVM model)
+        {
+            if(string.IsNullOrEmpty(model.AccessToken) ||
+                string.IsNullOrEmpty(model.RefreshToken))
+            {
+                return GetResult(ServiceResponse.BadRequestResponse("Invalid tokens"));
+            }
+
+            var response = await _jwtService.RefreshTokensAsync(model);
             return GetResult(response);
         }
     }

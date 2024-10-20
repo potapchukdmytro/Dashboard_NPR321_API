@@ -1,6 +1,7 @@
 using Dashboard.BLL.Middlewares;
 using Dashboard.BLL.Services.AccountService;
 using Dashboard.BLL.Services.ImageService;
+using Dashboard.BLL.Services.JwtService;
 using Dashboard.BLL.Services.MailService;
 using Dashboard.BLL.Services.RoleService;
 using Dashboard.BLL.Services.UserService;
@@ -17,7 +18,6 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,6 +79,7 @@ builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 
 // Add repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -131,6 +132,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<MiddlewareExceptionHandling>();
+app.UseMiddleware<MiddlewareSecurityTokenExceptionHandling>();
 
 app.UseHttpsRedirection();
 

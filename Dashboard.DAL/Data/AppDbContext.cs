@@ -1,4 +1,5 @@
-﻿using Dashboard.DAL.Models.Identity;
+﻿using Dashboard.DAL.Models;
+using Dashboard.DAL.Models.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,8 @@ namespace Dashboard.DAL.Data
     {
         public AppDbContext(DbContextOptions options)
             : base(options) { }
+
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
