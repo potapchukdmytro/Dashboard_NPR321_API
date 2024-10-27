@@ -60,7 +60,7 @@ namespace Dashboard.BLL.Services.RoleService
 
             var result = await _roleRepository.DeleteAsync(role);
 
-            return ServiceResponse.ByIdentityResult(result, "Роль кспішно видалена");
+            return ServiceResponse.ByIdentityResult(result, "Роль успішно видалена");
         }
 
         public async Task<ServiceResponse> CreteAsync(RoleVM model)

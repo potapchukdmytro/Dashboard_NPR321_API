@@ -82,6 +82,11 @@ namespace Dashboard.API.Controllers
                 return GetResult(ServiceResponse.BadRequestResponse("Ім'я ролі не може бути порожнім"));
             }
 
+            if (string.IsNullOrEmpty(model.Id))
+            {
+                return GetResult(ServiceResponse.BadRequestResponse("Id ролі не може бути порожнім"));
+            }
+
             var response = await _roleService.UpdateAsync(model);
             return GetResult(response);
         }
