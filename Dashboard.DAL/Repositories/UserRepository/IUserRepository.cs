@@ -16,7 +16,7 @@ namespace Dashboard.DAL.Repositories.UserRepository
         Task<string> GenerateEmailConfirmationTokenAsync(User user);
         Task<IdentityResult> ConfirmEmailAsync(User user, string token);
         Task<IdentityResult> CreateAsync(User user, string password);
-        Task<List<User>> GetAllAsync();
+        IQueryable<User> GetAll();
         Task<IdentityResult> UpdateAsync(User model);
         Task<IdentityResult> DeleteAsync(User model);
         Task<IdentityResult> AddToRoleAsync(User model, string role);

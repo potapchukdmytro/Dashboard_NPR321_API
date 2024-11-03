@@ -19,8 +19,8 @@ namespace Dashboard.API.Controllers
     //}
 
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [Authorize(Roles = "admin")]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(Roles = "admin")]
     [Route("api/[controller]")]
     public class UserController : BaseController
     {
@@ -71,11 +71,19 @@ namespace Dashboard.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUserAsync([FromQuery] string? id, string? email, string? userName)
+        public async Task<IActionResult> GetUserAsync([FromQuery] string? role, string? id, string? email, string? userName)
         {
             id = Request.Query[nameof(id)];
             userName = Request.Query[nameof(userName)];
             email = Request.Query[nameof(email)];
+            role = Request.Query[nameof(role)];
+
+            if (role != null)
+            {
+                var response = await _userService.GetUsersByRoleAsync(role);
+                return GetResult(response);
+            }
+
 
             if (id == null && userName == null && email == null)
             {

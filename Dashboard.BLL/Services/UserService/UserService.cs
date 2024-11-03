@@ -4,6 +4,7 @@ using Dashboard.DAL;
 using Dashboard.DAL.Models.Identity;
 using Dashboard.DAL.Repositories.UserRepository;
 using Dashboard.DAL.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dashboard.BLL.Services.UserService
 {
@@ -90,7 +91,9 @@ namespace Dashboard.BLL.Services.UserService
 
         public async Task<ServiceResponse> GetAllAsync()
         {
-            var users = await _userRepository.GetAllAsync();
+            var users = await _userRepository
+                .GetAll()
+                .ToListAsync();
 
             var models = _mapper.Map<List<UserVM>>(users);
 
@@ -137,6 +140,20 @@ namespace Dashboard.BLL.Services.UserService
             var model = _mapper.Map<UserVM>(user);
 
             return ServiceResponse.OkResponse("Користувача знайдено", model);
+        }
+
+        public async Task<ServiceResponse> GetUsersByRoleAsync(string role)
+        {
+            var models = await _userRepository
+                .GetAll()
+                .Where(u => u.UserRoles
+                    .Select(ur => ur.Role.NormalizedName)
+                    .Contains(role.ToUpper()))
+                .ToListAsync();
+
+            var users = _mapper.Map<List<UserVM>>(models);
+
+            return ServiceResponse.OkResponse("Users", users);
         }
 
         public async Task<ServiceResponse> UpdateAsync(CreateUpdateUserVM model)

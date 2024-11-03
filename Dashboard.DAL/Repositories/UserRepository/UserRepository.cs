@@ -46,12 +46,12 @@ namespace Dashboard.DAL.Repositories.UserRepository
             return await _userManager.GenerateEmailConfirmationTokenAsync(user);
         }
 
-        public async Task<List<User>> GetAllAsync()
+        public IQueryable<User> GetAll()
         {
-            return await _userManager.Users
+            return _userManager.Users
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
-                .ToListAsync();
+                .AsQueryable();
         }
 
         public async Task<User?> GetByEmailAsync(string email, bool includes = false)
