@@ -100,6 +100,41 @@ namespace Dashboard.BLL.Services.UserService
             return ServiceResponse.OkResponse("Користувачів отримано", models);
         }
 
+        public async Task<ServiceResponse> GetAllAsync(int page, int pageSize)
+        {
+            var users = _userRepository.GetAll();
+            int totalCount = users.Count();
+
+            if (pageSize == 0)
+            {
+                return ServiceResponse.BadRequestResponse($"Incorrect page size");
+            }
+
+            int pageCount = (int)Math.Ceiling(totalCount / (decimal)pageSize);
+
+            pageCount = pageCount == 0 ? 1 : pageCount;
+
+            if(page < 1 || page > pageCount)
+            {
+                return ServiceResponse.BadRequestResponse($"Page {page} not found");
+            }
+
+            var list = await users.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            var models = _mapper.Map<List<UserVM>>(list);
+
+            var payload = new UserListVM
+            {
+                PageCount = pageCount,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                Page = page,
+                Users = models
+            };
+
+            return ServiceResponse.OkResponse("Users list", payload);
+        }
+
         public async Task<ServiceResponse> GetByEmailAsync(string email)
         {
             var user = await _userRepository.GetByEmailAsync(email, true);

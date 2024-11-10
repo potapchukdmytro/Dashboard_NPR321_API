@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.InteropServices;
 
 namespace Dashboard.API.Controllers
 {
@@ -84,13 +85,6 @@ namespace Dashboard.API.Controllers
                 return GetResult(response);
             }
 
-
-            if (id == null && userName == null && email == null)
-            {
-                var response = await _userService.GetAllAsync();
-                return GetResult(response);
-            }
-
             if (!string.IsNullOrEmpty(id))
             {
                 var response = await _userService.GetByIdAsync(id);
@@ -117,6 +111,13 @@ namespace Dashboard.API.Controllers
             }
 
             return GetResult(ServiceResponse.BadRequestResponse("Не вдалося отримати користувача"));
+        }
+
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsersAsync(int page, int size)
+        {
+            var response = await _userService.GetAllAsync(page, size);
+            return GetResult(response);
         }
 
         [HttpDelete]

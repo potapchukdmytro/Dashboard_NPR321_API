@@ -1,4 +1,5 @@
 ﻿using Dashboard.DAL.ViewModels;
+using MimeKit.Tnef;
 
 namespace Dashboard.BLL.Services.UserService
 {
@@ -8,6 +9,7 @@ namespace Dashboard.BLL.Services.UserService
         Task<ServiceResponse> GetByEmailAsync(string email);
         Task<ServiceResponse> GetByUserNameAsync(string userName);
         Task<ServiceResponse> GetAllAsync();
+        Task<ServiceResponse> GetAllAsync(int page, int pageSize);
         Task<ServiceResponse> DeleteAsync(string id);
         Task<ServiceResponse> CreateAsync(CreateUpdateUserVM model);
         Task<ServiceResponse> UpdateAsync(CreateUpdateUserVM model);
