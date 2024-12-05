@@ -29,7 +29,7 @@ namespace Dashboard.BLL.Services.MailService
             const string URL_PARAM = "emailConfirmUrl";
             string confirmationUrl = $"{address}/api/account/emailconfrim?u={user.Id}&t={validToken}";
 
-            string rootPath = _webHostEnvironment.ContentRootPath;
+            string rootPath = _webHostEnvironment.WebRootPath;
             string templatePath = Path.Combine(rootPath, Settings.HtmlPagesPath, "emailconfirmation.html");
             string messageText = File.ReadAllText(templatePath);
             messageText = messageText.Replace(URL_PARAM, confirmationUrl);

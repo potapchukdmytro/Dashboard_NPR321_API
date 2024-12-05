@@ -20,7 +20,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="data\htmlPages\" />
+    <None Include="wwwroot\images\user\0431d356-7f50-4bda-8fe0-7bb448e359bc.jpeg" />
+    <None Include="wwwroot\images\user\0bb67d55-f569-4548-9dca-3f7456df6b05.jpeg" />
+    <None Include="wwwroot\images\user\3f0b2e58-3e52-4555-b6ad-94b1b19225e8.jpeg" />
+    <None Include="wwwroot\images\user\7113bd73-4661-4f0c-a0fc-beacd34df8ae.jpeg" />
+    <None Include="wwwroot\images\user\9be93688-ae5a-47ff-87a7-ebd5b85605a7.jpeg" />
+    <None Include="wwwroot\images\user\avatar.png" />
+    <None Include="wwwroot\templates\emailconfirmation.html" />
   </ItemGroup>
 
 </Project>

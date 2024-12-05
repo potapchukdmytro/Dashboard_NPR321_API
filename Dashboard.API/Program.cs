@@ -24,7 +24,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add database context
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlServer("name=Default");
+    // options.UseSqlServer("name=Default");
+    options.UseNpgsql("name=postgresDocker");
+    // options.UseNpgsql("name=postgresLocal");
 });
 
 // Add CORS
@@ -125,11 +127,14 @@ builder.Services.AddSwaggerGen(optinons =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseMiddleware<MiddlewareExceptionHandling>();
 app.UseMiddleware<MiddlewareSecurityTokenExceptionHandling>();
@@ -143,13 +148,13 @@ app.UseCors(myAllowSpecificOrigins);
 
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "data")),
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.WebRootPath, "templates")),
     RequestPath = "/files"
 });
 
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "data/images")),
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.WebRootPath, "images")),
     RequestPath = "/images"
 });
 
