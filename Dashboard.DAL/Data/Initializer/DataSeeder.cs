@@ -58,8 +58,8 @@ namespace Dashboard.DAL.Data.Initializer
                         LastName = "Dashboard"
                     };
 
-                    await userManager.CreateAsync(admin);
-                    await userManager.CreateAsync(user);
+                    await userManager.CreateAsync(admin, "qwerty");
+                    await userManager.CreateAsync(user, "qwerty");
 
                     await userManager.AddToRoleAsync(admin, Settings.AdminRole);
                     await userManager.AddToRoleAsync(user, Settings.UserRole);
