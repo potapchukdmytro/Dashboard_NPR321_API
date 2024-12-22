@@ -35,5 +35,11 @@ namespace Dashboard.API.Controllers
 
             return BadRequest("error");
         }
+
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            return Ok("Test method");
+        }
     }
 }
