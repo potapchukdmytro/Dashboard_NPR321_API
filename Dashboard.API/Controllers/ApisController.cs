@@ -39,7 +39,7 @@ namespace Dashboard.API.Controllers
         [HttpGet("test")]
         public IActionResult Test()
         {
-            return Ok("Test method");
+            return Ok("Test method 2");
         }
     }
 }
