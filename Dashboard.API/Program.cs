@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -94,36 +93,36 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(optinons =>
-{
-    optinons.SwaggerDoc("v1", new OpenApiInfo { Title = "NPR321", Version = "v1" });
+//builder.Services.AddSwaggerGen(optinons =>
+//{
+//    optinons.SwaggerDoc("v1", new OpenApiInfo { Title = "NPR321", Version = "v1" });
 
-    optinons.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "¬вед≥ть JWT токен"
-    });
+//    optinons.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+//    {
+//        Name = "Authorization",
+//        Type = SecuritySchemeType.Http,
+//        Scheme = "Bearer",
+//        BearerFormat = "JWT",
+//        In = ParameterLocation.Header,
+//        Description = "¬вед≥ть JWT токен"
+//    });
 
-    optinons.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            //new []{ Settings.AdminRole, Settings.UserRole }
-            Array.Empty<string>()
-        }
-    });
-});
+//    optinons.AddSecurityRequirement(new OpenApiSecurityRequirement
+//    {
+//        {
+//            new OpenApiSecurityScheme
+//            {
+//                Reference = new OpenApiReference
+//                {
+//                    Type = ReferenceType.SecurityScheme,
+//                    Id = "Bearer"
+//                }
+//            },
+//            //new []{ Settings.AdminRole, Settings.UserRole }
+//            Array.Empty<string>()
+//        }
+//    });
+//});
 
 var app = builder.Build();
 
@@ -134,8 +133,8 @@ var app = builder.Build();
 //    app.UseSwaggerUI();
 //}
 
-app.UseSwagger();
-app.UseSwaggerUI();
+//app.UseSwagger();
+//app.UseSwaggerUI();
 
 app.UseMiddleware<MiddlewareExceptionHandling>();
 app.UseMiddleware<MiddlewareSecurityTokenExceptionHandling>();
