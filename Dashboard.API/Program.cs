@@ -26,7 +26,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     // options.UseSqlServer("name=Default");
     //options.UseNpgsql("name=postgresElephant");
-    options.UseNpgsql("name=PostgreSqlUbuntu");
+    //options.UseNpgsql("name=PostgreSqlUbuntu");
+    options.UseSqlServer("name=AzureSql");
 });
 
 // Add CORS
