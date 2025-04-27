@@ -1,3 +1,5 @@
+using Dashboard.API.Infrastructure;
+using Dashboard.API.Jobs;
 using Dashboard.BLL.Middlewares;
 using Dashboard.BLL.Services.AccountService;
 using Dashboard.BLL.Services.ImageService;
@@ -17,6 +19,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Quartz;
+using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +45,25 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader();
     });
 });
+
+// Add quartz jobs
+var jobs = new (Type type, string cron)[]
+{
+    (typeof(ConsolePrintJob), "0 0 * * * ?"),
+    (typeof(LogsClearJob), "20 * * * * ?")
+};
+
+builder.Services.AddJobs(jobs);
+builder.Services.AddQuartzHostedService(opt => opt.WaitForJobsToComplete = true);
+
+// Add serilog
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/.log", rollingInterval: RollingInterval.Minute)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add identity
 builder.Services.AddIdentity<User, Role>(options =>

@@ -10,15 +10,22 @@ namespace Dashboard.API.Controllers
     public class RoleController : BaseController
     {
         private readonly IRoleService _roleService;
+        private readonly ILogger<RoleController> _logger;
 
-        public RoleController(IRoleService roleService)
+        public RoleController(IRoleService roleService, ILogger<RoleController> logger)
         {
             _roleService = roleService;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAsync([FromQuery] string? id, string? name)
         {
+            _logger.LogInformation(500, "Information test");
+            _logger.LogWarning("Warning log");
+            _logger.LogError("Error error");
+            _logger.LogCritical("Cricital!!");
+
             id = Request.Query[nameof(id)];
             name = Request.Query[nameof(name)];
 
